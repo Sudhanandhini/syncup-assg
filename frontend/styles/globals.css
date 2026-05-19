@@ -1,0 +1,41 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: #0d1117;
+  color: #e6edf3;
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0d1117; }
+::-webkit-scrollbar-thumb { background: #30363d; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #484f58; }
+
+/* Focus ring */
+*:focus-visible {
+  outline: 2px solid #25a9ae;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Category badge colors */
+.badge-tip          { background: #0f3443; color: #4fc3f7; border-color: #1565c0; }
+.badge-update       { background: #0d2818; color: #4caf50; border-color: #1b5e20; }
+.badge-motivation   { background: #3e1f0d; color: #ff9800; border-color: #e65100; }
+.badge-announcement { background: #2d0f3e; color: #ce93d8; border-color: #6a1b9a; }
+.badge-general      { background: #1a1f2e; color: #90a4ae; border-color: #37474f; }
