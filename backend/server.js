@@ -10,9 +10,18 @@ const app = express();
 const server = http.createServer(app);
 
 // ─── Socket.IO setup ──────────────────────────────────────────────────────────
+const allowedOrigins = [
+  process.env.FRONTEND_URL || 'http://localhost:3000',
+  'http://localhost:3000',
+];
+
 const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: (origin, cb) => {
+      // allow requests with no origin (curl, Postman) or matching origin
+      if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+      cb(new Error(`CORS blocked: ${origin}`));
+    },
     methods: ['GET', 'POST'],
   },
   // Prevent duplicate events: client-side dedup by event ID recommended
@@ -44,7 +53,12 @@ io.on('connection', (socket) => {
 app.set('io', io);
 
 // ─── Middleware ───────────────────────────────────────────────────────────────
-app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:3000' }));
+app.use(cors({
+  origin: (origin, cb) => {
+    if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+    cb(new Error(`CORS blocked: ${origin}`));
+  },
+}));
 app.use(express.json());
 
 // ─── Routes ───────────────────────────────────────────────────────────────────

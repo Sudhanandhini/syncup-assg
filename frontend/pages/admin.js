@@ -99,6 +99,14 @@ export default function AdminPage() {
 
       setSuccessMsg(editingId ? `"${json.data.title}" updated!` : `"${json.data.title}" published!`);
       setTimeout(() => setSuccessMsg(null), 3500);
+
+      // Update list immediately — don't wait for socket event
+      if (editingId) {
+        setFeeds((prev) => prev.map((f) => (f._id === json.data._id ? json.data : f)));
+      } else {
+        setFeeds((prev) => (prev.some((f) => f._id === json.data._id) ? prev : [json.data, ...prev]));
+      }
+
       setForm(EMPTY_FORM);
       setEditingId(null);
     } catch (err) {
@@ -112,7 +120,12 @@ export default function AdminPage() {
     if (!confirm('Delete this post?')) return;
     try {
       setDeletingId(id);
-      await fetch(`${API}/api/feed/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${API}/api/feed/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setFeeds((prev) => prev.filter((f) => f._id !== id));
+      } else {
+        alert('Delete failed. Try again.');
+      }
     } catch {
       alert('Delete failed. Try again.');
     } finally {
