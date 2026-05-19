@@ -10,19 +10,21 @@ const app = express();
 const server = http.createServer(app);
 
 // ─── Socket.IO setup ──────────────────────────────────────────────────────────
-const allowedOrigins = [
-  process.env.FRONTEND_URL || 'http://localhost:3000',
-  'http://localhost:3000',
-];
+const isOriginAllowed = (origin) => {
+  if (!origin) return true;
+  if (origin === 'http://localhost:3000') return true;
+  const frontendUrl = (process.env.FRONTEND_URL || '').replace(/\/$/, '');
+  return frontendUrl && origin.replace(/\/$/, '') === frontendUrl;
+};
 
 const io = new Server(server, {
   cors: {
     origin: (origin, cb) => {
-      // allow requests with no origin (curl, Postman) or matching origin
-      if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+      if (isOriginAllowed(origin)) return cb(null, true);
       cb(new Error(`CORS blocked: ${origin}`));
     },
     methods: ['GET', 'POST'],
+    credentials: true,
   },
   // Prevent duplicate events: client-side dedup by event ID recommended
   connectionStateRecovery: {
@@ -55,9 +57,10 @@ app.set('io', io);
 // ─── Middleware ───────────────────────────────────────────────────────────────
 app.use(cors({
   origin: (origin, cb) => {
-    if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+    if (isOriginAllowed(origin)) return cb(null, true);
     cb(new Error(`CORS blocked: ${origin}`));
   },
+  credentials: true,
 }));
 app.use(express.json());
 

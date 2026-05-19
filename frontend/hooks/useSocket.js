@@ -28,10 +28,11 @@ export function useSocket(onNewFeed, onDeleteFeed, onStatusChange, onUpdateFeed)
       socketInstance = io(
         process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5000',
         {
-          transports: ['websocket', 'polling'],
+          transports: ['polling', 'websocket'],
           reconnectionAttempts: Infinity,
           reconnectionDelay: 1000,
           reconnectionDelayMax: 10000,
+          upgrade: true,
         }
       );
     }
